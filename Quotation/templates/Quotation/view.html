@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+<script type='text/javascript'>
+	$('input[type="text"]').addClass('form-control');
+	$('textarea').addClass('form-control');
+</script>
+<div>
+	<form action="" method="post" >
+		<div class="container" style="margin-top: 50px;">
+		<h2 style="color:blue;"><i><b>client list</b></i></h2>
+		{% if Quotation_list %}
+			{% for q in Quotation_list %}
+				<ul>
+					<li><h3>{{q.client}}</h3></li>
+					<p><a href="{% url 'Quotation:item_detail' q.pk %}" class="btn btn-primary" role="button">View</a></p>
+				</ul>	
+			{% endfor %}	
+		{% endif %}	
+		</div>
+	</form>
+</div>
+{% endblock body %}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>update deatils</title>
+	<h1>Update Client Profile</h1>
+</head>
+<script type='text/javascript'>
+	$('input[type="text"]').addClass('form-control');
+	$('textarea').addClass('form-control');
+</script>
+<body>
+	<form action="" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		{{user_form.as_p}}
+		{{item_form.as_p}}
+		<input type='submit' value='Update' class='btn btn-primary btn-lg btn-block'/>
+ 
+	</form>
+</body>
+</html>
