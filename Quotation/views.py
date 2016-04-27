@@ -11,23 +11,31 @@ def home(request):
 	return render(request, 'Quotation/home.html',{})
 
 @login_required(login_url='/admin/login/')
-def createitem(request):
+def createitem_formset(request):
 	ItemFormSet = formset_factory(ItemForm, extra=2)
 	
 	if request.method == 'POST':
 		user_form = QuotationForm(request.POST)
 		# item_form = ItemForm(request.POST)
-		formset = ItemFormSet(request.POST,request.FILES)
+		formset = ItemFormSet(request.POST)
 		if user_form.is_valid() and formset.is_valid():
 			quotation_no = user_form.save()
-			item = formset.save(commit = False)
-			item.quotation_no = quotation_no
-			item.total= item.quantity * item.price
-			item.save()
+			for it in formset:
+				it.quotation_no=quotation_no
+				item = it.cleaned_data('item')
+				quantity = it.cleaned_data('quantity')
+				price =it.cleaned_data('price')
+				it.save()
+
+			# item = formset.save()
+			# item.quotation_no = quotation_no
+			# item.total= item.quantity * item.price
+			# item.save()
 
 			messages.add_message(request, messages.INFO, 'user added details!')
 			
 			user_form = QuotationForm()
+			formset = ItemFormSet()
 			# item_form = ItemForm()
 		else:
 			HttpResponse('errors availabe on same page...goto the same page again.')
@@ -37,7 +45,7 @@ def createitem(request):
 		# item_form = ItemForm()
 		formset = ItemFormSet()
 
-	return render (request,'Quotation/create.html',{'user_form':user_form, 'formset':formset})			
+	return render (request,'Quotation/create1.html',{'user_form':user_form, 'formset':formset})			
 
 @login_required(login_url='/admin/login/')
 def itemlist(request):
@@ -85,3 +93,27 @@ def updateitem(request):
 
 	context={'user_form':user_form, 'item_form':item_form}
 	return render (request,'Quotation/update.html',context)
+
+@login_required(login_url='/admin/login/')
+def createitem(request):
+	if request.method == 'POST':
+		user_form = QuotationForm(request.POST)
+		item_form = ItemForm(request.POST)
+		if user_form.is_valid() and item_form.is_valid():
+			quotation_no = user_form.save()
+			item = item_form.save(commit = False)
+			item.quotation_no = quotation_no
+			item.total= item.quantity * item.price
+			item.save()
+			messages.add_message(request, messages.INFO, 'user added details!')
+
+			user_form = QuotationForm()
+			item_form = ItemForm()
+		else:
+			HttpResponse('errors availabe on same page...goto the same page again.')
+
+	else:
+		user_form = QuotationForm()
+		item_form = ItemForm()
+
+	return render (request,'Quotation/create.html',{'user_form':user_form, 'item_form':item_form})			
