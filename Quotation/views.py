@@ -12,37 +12,31 @@ def home(request):
 
 @login_required(login_url='/admin/login/')
 def createitem_formset(request):
-	ItemFormSet = formset_factory(ItemForm, extra=2)
-	
+	ItemFormSet = formset_factory(ItemForm)
+	print 1
 	if request.method == 'POST':
 		user_form = QuotationForm(request.POST)
-		# item_form = ItemForm(request.POST)
-		formset = ItemFormSet(request.POST)
-		if user_form.is_valid() and formset.is_valid():
-			quotation_no = user_form.save()
-			for it in formset:
-				it.quotation_no=quotation_no
-				item = it.cleaned_data('item')
-				quantity = it.cleaned_data('quantity')
-				price =it.cleaned_data('price')
-				it.save()
-
-			# item = formset.save()
-			# item.quotation_no = quotation_no
-			# item.total= item.quantity * item.price
-			# item.save()
+		formset = ItemFormSet(request.POST, request.FILES)
+		print 2
+		if user_form.is_valid() and formset.is_valid() :
+			print 3
+			quotation_no =  user_form.save()
+			print 4
+			item = formset.save(commit=False)
+			item.quotation_no = quotation_no
+			item.total= item.quantity * item.price
+			item.save()
 
 			messages.add_message(request, messages.INFO, 'user added details!')
 			
 			user_form = QuotationForm()
 			formset = ItemFormSet()
-			# item_form = ItemForm()
 		else:
-			HttpResponse('errors availabe on same page...goto the same page again.')
+			formset.errors
+			# HttpResponse('errors availabe on same page...goto the same page again.')
 
 	else:
 		user_form = QuotationForm()
-		# item_form = ItemForm()
 		formset = ItemFormSet()
 
 	return render (request,'Quotation/create1.html',{'user_form':user_form, 'formset':formset})			
